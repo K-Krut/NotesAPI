@@ -1,13 +1,11 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+from routes import notes
 
+app = FastAPI(title="Notes API")
+app.include_router(notes.router, prefix="/api/notes", tags=["notes"])
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
