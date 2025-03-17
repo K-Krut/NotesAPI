@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
-import os
 
 load_dotenv()
 
@@ -11,11 +10,6 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: str
     POSTGRES_PASSWORD: str
-    # POSTGRES_DB: str = os.environ.get("POSTGRES_DB")
-    # POSTGRES_USER: str = os.environ.get("POSTGRES_USER")
-    # POSTGRES_HOST: str = os.environ.get("POSTGRES_HOST")
-    # POSTGRES_PORT: str = os.environ.get("POSTGRES_PORT")
-    # POSTGRES_PASSWORD: str = os.environ.get("POSTGRES_PASSWORD")
 
     @property
     def DATABASE_URL(self) -> str:
@@ -25,5 +19,5 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
 
-
 settings = Settings()
+settings.DATABASE_URL
