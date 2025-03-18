@@ -22,7 +22,7 @@ class Token(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     jti = Column(String, unique=True, index=True, nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
     is_blacklisted = Column(Boolean, default=False)
 
     expires_at = Column(DateTime, nullable=False)
@@ -42,8 +42,8 @@ class Note(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
     user = relationship('User', backref='notes')
 
-    parent_id = Column(Integer, ForeignKey('notes.id'), nullable=True)
+    parent_id = Column(Integer, ForeignKey('notes.id', ondelete="CASCADE"), nullable=True)
     parent = relationship('Note', backref='versions', remote_side="Note.id")
