@@ -5,3 +5,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_hashed_password(password: str) -> str:
     return pwd_context.hash(password)
+
+
+def verify_password(plain_pass: str, hashed_pass: str) -> bool:
+    return pwd_context.verify(plain_pass, hashed_pass)
