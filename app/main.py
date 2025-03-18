@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from routes import auth, notes
+from app.routes import auth, notes
 
 app = FastAPI(title="Notes API")
 
@@ -16,4 +16,4 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("app.main:app", reload=True)
