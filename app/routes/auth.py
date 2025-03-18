@@ -1,11 +1,15 @@
-from fastapi import APIRouter
-from app.schemas.users import UserResponse
+from typing import Any
+from fastapi import APIRouter, Depends
+from schemas.users import UserResponse, User
+from sqlalchemy.orm import Session
+from database import get_db
+
 
 router = APIRouter()
 
 
 @router.post("/register", response_model=UserResponse)
-def register():
+def register(user: User, db: Session = Depends(get_db)) -> Any:
     pass
 
 

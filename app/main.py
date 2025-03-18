@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.routes import notes, auth
+from routes import auth, notes
 
 app = FastAPI(title="Notes API")
 
@@ -13,3 +13,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 async def root():
     return {"message": "Hello World"}
 
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", reload=True)
