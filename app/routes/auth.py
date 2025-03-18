@@ -1,3 +1,4 @@
+import logging
 from http.client import HTTPException
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
@@ -7,6 +8,7 @@ from app.database import get_db
 from app.crud.users import get_user_by_email, create_user
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/register", response_model=UserResponse)
@@ -23,6 +25,7 @@ def register(user: UserSchema, db: Session = Depends(get_db)) -> Any:
     except HTTPException as error:
         raise error
     except Exception as error:
+        logger.error(f'----#ERROR in register(): ${error}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error. ${error}",
