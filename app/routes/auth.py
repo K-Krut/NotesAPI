@@ -19,16 +19,16 @@ def register(user: UserSchema, db: Session = Depends(get_db)) -> Any:
         if check_user:
             raise HTTPException(
                 status_code=400,
-                detail=f"User with '${user.email}' email already registered",
+                detail=f"User with '{user.email}' email already registered",
             )
         return create_user(db, user)
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in register(): ${error}')
+        logger.error(f'----#ERROR in register(): {error}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal server error. ${error}",
+            detail=f"Internal server error. {error}",
         )
 
 
