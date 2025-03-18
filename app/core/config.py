@@ -21,4 +21,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-settings.DATABASE_URL
