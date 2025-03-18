@@ -3,7 +3,10 @@ from fastapi import FastAPI
 from app.routes import notes
 
 app = FastAPI(title="Notes API")
+
+
 app.include_router(notes.router, prefix="/api/notes", tags=["notes"])
+
 
 @app.get("/")
 async def root():
