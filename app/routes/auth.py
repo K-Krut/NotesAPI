@@ -52,8 +52,8 @@ def login(user: UserSchema, db: Session = Depends(get_db)) -> Any:
             )
 
         return {
-            'access_token': create_access_token(db, user.id),
-            'refresh_token': create_refresh_token(db, user.id),
+            'access_token': create_access_token(db, user_record.id),
+            'refresh_token': create_refresh_token(db, user_record.id),
             'user': UserResponse(id=user_record.id, email=user_record.email)
         }
     except HTTPException as error:
