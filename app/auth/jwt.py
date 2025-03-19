@@ -7,7 +7,7 @@ from app.core.config import settings
 from app.models.models import Token
 
 
-def create_token(db: Session, token_data: dict):
+def create_token(db: Session, token_data: dict) -> None:
     token_record = Token(
         jti=token_data.get('jti'),
         user_id=token_data.get('id'),
@@ -17,7 +17,7 @@ def create_token(db: Session, token_data: dict):
     db.commit()
 
 
-def generate_token(db: Session, user_id: int, expires_time: int):
+def generate_token(db: Session, user_id: int, expires_time: int) -> str:
     token_data = {
         "id": user_id,
         "exp": (datetime.utcnow() + timedelta(minutes=expires_time)).timestamp(),
@@ -30,9 +30,9 @@ def generate_token(db: Session, user_id: int, expires_time: int):
     return token
 
 
-def create_access_token(db: Session, user_id: int):
+def create_access_token(db: Session, user_id: int) -> str:
     return generate_token(db, user_id, expires_time=settings.ACCESS_TOKEN_EXPIRE)
 
 
-def create_refresh_token(db: Session, user_id: int):
+def create_refresh_token(db: Session, user_id: int) -> str:
     return generate_token(db, user_id, expires_time=settings.REFRESH_TOKEN_EXPIRE)
