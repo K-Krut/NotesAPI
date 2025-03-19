@@ -18,7 +18,7 @@ def register(user: UserSchema, db: Session = Depends(get_db)) -> Any:
 
         if check_user:
             raise HTTPException(
-                status_code=400,
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"User with '{user.email}' email already registered",
             )
         return create_user(db, user)
@@ -33,8 +33,31 @@ def register(user: UserSchema, db: Session = Depends(get_db)) -> Any:
 
 
 @router.post("/login", response_model=UserResponse)
-def login():
-    pass
+def login(user: UserSchema, db: Session = Depends(get_db)) -> Any:
+    try:
+        user_record = get_user_by_email(db, email=user.email)
+
+        if not user_record:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"User with '{user.email}' email doesn't exist",
+            )
+        if not verify_passwordverify_password(user.password, user_record.password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Incorrect password",
+            )
+
+
+
+    except HTTPException as error:
+        raise error
+    except Exception as error:
+        logger.error(f'----#ERROR in register(): {error}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal server error. {error}",
+        )
 
 
 @router.post("/logout")

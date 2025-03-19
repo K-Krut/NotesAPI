@@ -18,4 +18,3 @@ def create_user(db: Session, user: UserSchema) -> User:
     db.commit()
     db.refresh(user_record)
     return user_record
-
