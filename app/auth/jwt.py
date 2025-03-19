@@ -36,3 +36,15 @@ def create_access_token(db: Session, user_id: int) -> str:
 
 def create_refresh_token(db: Session, user_id: int) -> str:
     return generate_token(db, user_id, expires_time=settings.REFRESH_TOKEN_EXPIRE)
+
+
+def get_token_by_jti(db: Session, jti: str) -> Token | None:
+    return db.query(Token).filter(Token.jti == jti).first()
+
+
+def blacklist_token(db: Session, token_jti: str) -> None:
+    token = get_token_by_jti(db, token_jti)
+    if token:
+        token.is_blacklisted = True
+        db.commit()
+        db.refresh(token)
