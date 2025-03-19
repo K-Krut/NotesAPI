@@ -6,6 +6,8 @@ from app.schemas.users import UserResponse, UserSchema
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.crud.users import get_user_by_email, create_user
+from app.auth.jwt import create_access_token, create_refresh_token
+
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -42,14 +44,18 @@ def login(user: UserSchema, db: Session = Depends(get_db)) -> Any:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"User with '{user.email}' email doesn't exist",
             )
+
         if not verify_passwordverify_password(user.password, user_record.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Incorrect password",
             )
 
-
-
+        return {
+            'access_token': create_access_token(db, user.id),
+            'refresh_token': create_refresh_token(db, user.id),
+            'user': UserResponse(id=user_record.id, email=user_record.email)
+        }
     except HTTPException as error:
         raise error
     except Exception as error:
@@ -68,4 +74,3 @@ def logout():
 @router.post("/token/refresh")
 def token_refresh():
     pass
-
