@@ -22,6 +22,7 @@ class NoteParentResponse(BaseModel):
         from_attributes = True
         arbitrary_types_allowed = True
 
+
 class NoteResponse(BaseModel):
     id: int
     name: str
