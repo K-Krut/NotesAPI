@@ -1,8 +1,8 @@
 import logging
 from http.client import HTTPException
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status
-from app.schemas.users import UserResponse, UserSchema, LoginResponse, RefreshResponse, RefreshRequest
+from fastapi import APIRouter, Depends, HTTPException, status, Response
+from app.schemas.users import UserResponse, UserSchema, LoginResponse, RefreshResponse, RefreshRequest, LogoutRequest
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.crud.users import get_user_by_email, create_user
@@ -27,7 +27,7 @@ def register(user: UserSchema, db: Session = Depends(get_db)) -> Any:
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in register(): {error}')
+        logger.error(f'----#ERROR in /api/auth/register: {error}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error. {error}",
@@ -59,7 +59,7 @@ def login(user: UserSchema, db: Session = Depends(get_db)) -> Any:
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in register(): {error}')
+        logger.error(f'----#ERROR in /api/auth/login: {error}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error. {error}",
@@ -67,8 +67,27 @@ def login(user: UserSchema, db: Session = Depends(get_db)) -> Any:
 
 
 @router.post("/logout")
-def logout():
-    pass
+def logout(tokens: LogoutRequest, db: Session = Depends(get_db)) -> Any:
+    try:
+        validated_access_token = validate_token(db, tokens.access_token)
+        validated_refresh_token = validate_token(db, tokens.refresh_token)
+
+        if not validated_access_token and not validated_refresh_token:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+        if validated_access_token:
+            blacklist_token(db, validated_access_token.get('jti'))
+        blacklist_token(db, validated_refresh_token.get('jti'))
+
+        return Response(status_code=status.HTTP_200_OK)
+    except HTTPException as error:
+        raise error
+    except Exception as error:
+        logger.error(f'----#ERROR in /api/auth/logout: {error}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal server error. {error}",
+        )
 
 
 @router.post("/token/refresh")
@@ -88,7 +107,7 @@ def token_refresh(token: RefreshRequest, db: Session = Depends(get_db)) -> Any:
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in token_refresh(): {error}')
+        logger.error(f'----#ERROR in in /api/auth/token/refresh: {error}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error. {error}",
