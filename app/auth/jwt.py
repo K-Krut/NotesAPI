@@ -1,6 +1,8 @@
 import uuid
 from datetime import datetime, timedelta
-from jose import jwt
+
+from fastapi import HTTPException, status
+from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -48,3 +50,16 @@ def blacklist_token(db: Session, token_jti: str) -> None:
         token.is_blacklisted = True
         db.commit()
         db.refresh(token)
+
+
+def validate_token(db: Session, token: str) -> bool:
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+        jti: str = payload.get('jti')
+        exp: int = payload.get('exp')
+
+        token_record = get_token_by_jti(db, jti)
+
+        return exp > datetime.utcnow().timestamp() and not token_record.is_blacklisted
+    except JWTError:
+        return False
