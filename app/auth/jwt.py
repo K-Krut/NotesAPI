@@ -1,15 +1,15 @@
 import uuid
 import logging
 from datetime import datetime, timedelta
-
-from fastapi import HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException, status, Depends
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
-
 from app.core.config import settings
 from app.models.models import Token
 
 logger = logging.getLogger(__name__)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def create_token(db: Session, token_data: dict) -> None:
@@ -71,7 +71,7 @@ def validate_token(db: Session, token: str) -> dict | None:
         return None
 
 
-def get_user_by_jwt_token(db: Session, token: str) -> int | None:
+def get_user_by_jwt_token(db: Session, token: str = Depends(oauth2_scheme)) -> int:
     validated_token = validate_token(db, token)
     if not validated_token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid token")
