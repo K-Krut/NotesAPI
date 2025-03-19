@@ -1,7 +1,7 @@
 import logging
 from http.client import HTTPException
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from app.schemas.users import UserResponse, UserSchema, LoginResponse, RefreshResponse, RefreshRequest, LogoutRequest
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -75,7 +75,8 @@ def logout(tokens: LogoutRequest, db: Session = Depends(get_db)) -> Any:
         if not validated_access_token and not validated_refresh_token:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-        blacklist_token(db, validated_access_token.get('jti'))
+        if validated_access_token:
+            blacklist_token(db, validated_access_token.get('jti'))
         blacklist_token(db, validated_refresh_token.get('jti'))
 
         return Response(status_code=status.HTTP_200_OK)
