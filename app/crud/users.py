@@ -1,7 +1,7 @@
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from app.models.models import User
-from app.schemas.users import UserSchema, UserResponse
+from app.schemas.users import UserSchema
 from app.auth.hash import get_hashed_password
 
 

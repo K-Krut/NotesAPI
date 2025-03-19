@@ -2,6 +2,7 @@ import uuid
 import logging
 from datetime import datetime, timedelta
 
+from fastapi import HTTPException, status
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
@@ -68,3 +69,10 @@ def validate_token(db: Session, token: str) -> dict | None:
     except JWTError:
         logger.error(f'----#ERROR (JWTError) in validate_token()')
         return None
+
+
+def get_user_by_jwt_token(db: Session, token: str) -> int | None:
+    validated_token = validate_token(db, token)
+    if not validated_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid token")
+    return validated_token.get('user_id')
