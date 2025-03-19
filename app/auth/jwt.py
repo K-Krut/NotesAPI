@@ -8,13 +8,21 @@ from app.models.models import Token
 
 
 def create_token(db: Session, token_data: dict):
-    token_record = Token(jti=token_data.get('jti'), user_id=token_data.get('id'), expires_at=token_data.get('exp'))
+    token_record = Token(
+        jti=token_data.get('jti'),
+        user_id=token_data.get('id'),
+        expires_at=datetime.fromtimestamp(token_data.get('exp'))
+    )
     db.add(token_record)
     db.commit()
 
 
 def generate_token(db: Session, user_id: int, expires_time: int):
-    token_data = {"id": user_id, "exp": datetime.now() + timedelta(minutes=expires_time), "jti": str(uuid.uuid4())}
+    token_data = {
+        "id": user_id,
+        "exp": (datetime.utcnow() + timedelta(minutes=expires_time)).timestamp(),
+        "jti": str(uuid.uuid4())
+    }
     token = jwt.encode(token_data, settings.SECRET_KEY, settings.ALGORITHM)
 
     create_token(db, token_data)
