@@ -1,12 +1,14 @@
 import uuid
+import logging
 from datetime import datetime, timedelta
 
-from fastapi import HTTPException, status
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.models.models import Token
+
+logger = logging.getLogger(__name__)
 
 
 def create_token(db: Session, token_data: dict) -> None:
@@ -52,14 +54,17 @@ def blacklist_token(db: Session, token_jti: str) -> None:
         db.refresh(token)
 
 
-def validate_token(db: Session, token: str) -> bool:
+def validate_token(db: Session, token: str) -> dict | None:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
         jti: str = payload.get('jti')
         exp: int = payload.get('exp')
-
+        user_id: int = payload.get('id')
         token_record = get_token_by_jti(db, jti)
 
-        return exp > datetime.utcnow().timestamp() and not token_record.is_blacklisted
+        if exp > datetime.utcnow().timestamp() and not token_record.is_blacklisted:
+            return {'jti': jti, 'user_id': user_id}
+        return None
     except JWTError:
-        return False
+        logger.error(f'----#ERROR (JWTError) in validate_token()')
+        return None

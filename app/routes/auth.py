@@ -2,11 +2,11 @@ import logging
 from http.client import HTTPException
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.schemas.users import UserResponse, UserSchema, LoginResponse
+from app.schemas.users import UserResponse, UserSchema, LoginResponse, RefreshResponse, RefreshRequest
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.crud.users import get_user_by_email, create_user
-from app.auth.jwt import create_access_token, create_refresh_token
+from app.auth.jwt import create_access_token, create_refresh_token, blacklist_token, validate_token
 from app.auth.hash import verify_password
 
 router = APIRouter()
@@ -72,5 +72,24 @@ def logout():
 
 
 @router.post("/token/refresh")
-def token_refresh():
-    pass
+def token_refresh(token: RefreshRequest, db: Session = Depends(get_db)) -> Any:
+    try:
+        validated_token = validate_token(db, token.refresh_token)
+
+        if not validated_token:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+        blacklist_token(db, validated_token.get('jti'))
+
+        return RefreshResponse(
+            access_token=create_access_token(db, validated_token.get('user_id')),
+            refresh_token=create_refresh_token(db, validated_token.get('user_id')),
+        )
+    except HTTPException as error:
+        raise error
+    except Exception as error:
+        logger.error(f'----#ERROR in token_refresh(): {error}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal server error. {error}",
+        )
