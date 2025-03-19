@@ -1,13 +1,13 @@
 import logging
 from http.client import HTTPException
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException
-from app.schemas.users import UserResponse, UserSchema
+from fastapi import APIRouter, Depends, HTTPException, status
+from app.schemas.users import UserResponse, UserSchema, LoginResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.crud.users import get_user_by_email, create_user
 from app.auth.jwt import create_access_token, create_refresh_token
-
+from app.auth.hash import verify_password
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ def register(user: UserSchema, db: Session = Depends(get_db)) -> Any:
         )
 
 
-@router.post("/login", response_model=UserResponse)
+@router.post("/login", response_model=LoginResponse)
 def login(user: UserSchema, db: Session = Depends(get_db)) -> Any:
     try:
         user_record = get_user_by_email(db, email=user.email)
@@ -45,17 +45,17 @@ def login(user: UserSchema, db: Session = Depends(get_db)) -> Any:
                 detail=f"User with '{user.email}' email doesn't exist",
             )
 
-        if not verify_passwordverify_password(user.password, user_record.password):
+        if not verify_password(user.password, user_record.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Incorrect password",
             )
 
-        return {
-            'access_token': create_access_token(db, user_record.id),
-            'refresh_token': create_refresh_token(db, user_record.id),
-            'user': UserResponse(id=user_record.id, email=user_record.email)
-        }
+        return LoginResponse(
+            access_token=create_access_token(db, user_record.id),
+            refresh_token=create_refresh_token(db, user_record.id),
+            user=UserResponse.model_validate(user_record)
+        )
     except HTTPException as error:
         raise error
     except Exception as error:
