@@ -9,11 +9,24 @@ class NoteSchema(BaseModel):
     parent_id: Optional[int] = None
 
 
+
+class NoteParentResponse(BaseModel):
+    id: int
+    name: str
+    details: str
+    parent_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+        arbitrary_types_allowed = True
+
 class NoteResponse(BaseModel):
     id: int
     name: str
     details: str
-    parent: Optional["NoteResponse"] = None
+    parent: Optional[NoteParentResponse] = None
     created_at: datetime
     updated_at: datetime
 
