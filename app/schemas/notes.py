@@ -37,8 +37,8 @@ class NoteResponse(BaseModel):
 
 
 class NoteUpdateSchema(BaseModel):
-    name: Optional[str]
-    details: Optional[str]
+    name: Optional[str] = None
+    details: Optional[str] = None
 
 
 class NoteFullUpdateSchema(BaseModel):
