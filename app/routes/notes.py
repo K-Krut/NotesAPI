@@ -13,6 +13,18 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+def get_checked_note(db: Session, note_id: int, user_id: int):
+    note_record = get_note_db(db, note_id)
+
+    if not note_record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note not found")
+
+    if not note_record.user_id == user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Access denied")
+
+    return note_record
+
+
 @router.get("/")
 def get_notes():
     pass
@@ -21,14 +33,7 @@ def get_notes():
 @router.get("/{note_id}")
 def get_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
     try:
-        note_record = get_note_db(db, note_id)
-
-        if not note_record:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note not found")
-
-        if not note_record.user_id == user_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Access denied")
-
+        note_record = get_checked_note(db, note_id, user_id)
         note_parent = get_note_db(db, note_record.parent_id)
 
         return generate_note_details_response(note_record, note_parent)
@@ -61,13 +66,7 @@ def update_note_fully(
         user_id: int = Depends(get_user_by_jwt_token)
 ):
     try:
-        note_record = get_note_db(db, note_id)
-
-        if not note_record:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note not found")
-
-        if not note_record.user_id == user_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Access denied")
+        note_record = get_checked_note(db, note_id, user_id)
 
         update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
 
@@ -89,13 +88,7 @@ def update_note(
         user_id: int = Depends(get_user_by_jwt_token)
 ):
     try:
-        note_record = get_note_db(db, note_id)
-
-        if not note_record:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note not found")
-
-        if not note_record.user_id == user_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Access denied")
+        note_record = get_checked_note(db, note_id, user_id)
 
         update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
 
@@ -113,14 +106,7 @@ def update_note(
 @router.delete("/{note_id}")
 def delete_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
     try:
-        note_record = get_note_db(db, note_id)
-
-        if not note_record:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note not found")
-
-        if not note_record.user_id == user_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Access denied")
-
+        note_record = get_checked_note(db, note_id, user_id)
         delete_note_db(db, note_id)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as error:
