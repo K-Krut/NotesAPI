@@ -19,8 +19,7 @@ def seed_main_notes(db: Session, count: int = 10):
         note = Note(
             name=fake.sentence(nb_words=randint(1, 10)),
             details=fake.text(max_nb_chars=3000),
-            user_id=1,
-            # user_id=random.choice([user.id for user in users]),
+            user_id=random.choice([user.id for user in users]),
             created_at=fake.date_time_this_year(),
             updated_at=fake.date_time_this_year(),
         )

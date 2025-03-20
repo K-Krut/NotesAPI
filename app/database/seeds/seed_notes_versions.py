@@ -25,8 +25,7 @@ def adjust_text(text, updates):
 
 
 def seed_notes_versions(db: Session, count: int = 10):
-    notes = db.query(Note).filter(Note.user_id == 1).all()
-    # notes = db.query(Note).filter(Note.parent_id.isnot(None)).all()
+    notes = db.query(Note).filter(Note.parent_id.isnot(None)).all()
     for _ in range(count):
         parent = random.choice(notes)
         note = Note(
