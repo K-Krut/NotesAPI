@@ -32,6 +32,8 @@ def get_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends
         note_parent = get_note_db(db, note_record.parent_id)
 
         return generate_note_details_response(note_record, note_parent)
+    except HTTPException as error:
+        raise error
     except Exception as error:
         logger.error(f'----#ERROR in POST /api/notes/[id]: {error}')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
@@ -44,6 +46,8 @@ def create_note(note: NoteSchema, db: Session = Depends(get_db), user_id: int = 
         note_parent = get_note_db(db, note_record.parent_id)
 
         return generate_note_details_response(note_record, note_parent)
+    except HTTPException as error:
+        raise error
     except Exception as error:
         logger.error(f'----#ERROR in POST /api/notes: {error}')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
