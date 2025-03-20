@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response
 
 from app.auth.jwt import get_user_by_jwt_token
 from app.crud.notes import create_note_db, get_note_db, delete_note_db, update_note_db
-from app.schemas.notes import NoteSchema, NoteResponse, NoteParentResponse, NoteUpdateSchema
+from app.schemas.notes import NoteSchema, NoteResponse, NoteParentResponse, NoteUpdateSchema, NoteFullUpdateSchema
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.utils.notes import generate_note_details_response
@@ -54,8 +54,31 @@ def create_note(note: NoteSchema, db: Session = Depends(get_db), user_id: int = 
 
 
 @router.put("/{note_id}")
-def update_note_fully(note_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
-    pass
+def update_note_fully(
+        note_id: int,
+        fields: NoteFullUpdateSchema,
+        db: Session = Depends(get_db),
+        user_id: int = Depends(get_user_by_jwt_token)
+):
+    try:
+        note_record = get_note_db(db, note_id)
+
+        if not note_record:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note not found")
+
+        if not note_record.user_id == user_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Access denied")
+
+        update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
+
+        note_parent = get_note_db(db, note_record.parent_id)
+
+        return generate_note_details_response(note_record, note_parent)
+    except HTTPException as error:
+        raise error
+    except Exception as error:
+        logger.error(f'----#ERROR in PUT /api/notes/[id]: {error}')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
 @router.patch("/{note_id}")
