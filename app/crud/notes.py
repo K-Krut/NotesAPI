@@ -14,3 +14,8 @@ def create_note_db(db: Session, note: NoteSchema, user_id: int) -> Note:
 
 def get_note_db(db: Session, note_id: int) -> Note | None:
     return db.query(Note).filter(Note.id == note_id).first()
+
+
+def delete_note_db(db: Session, note_id: int) -> None:
+    db.query(Note).filter(Note.id == note_id).delete()
+    db.commit()
