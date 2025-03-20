@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response, Query
 
 from app.auth.jwt import get_user_by_jwt_token
 from app.core.config import settings
-from app.crud.notes import create_note_db, get_note_db, delete_note_db, update_note_db, get_latest_notes_db
+from app.crud.notes import create_note_db, get_note_db, delete_note_db, update_note_db, get_user_notes_db, \
+    paginate_query
 from app.schemas.notes import NoteSchema, NoteResponse, NoteParentResponse, NoteUpdateSchema, NoteFullUpdateSchema, \
     NotesListResponse
 from sqlalchemy.orm import Session
@@ -44,11 +45,12 @@ def get_notes(
         limit: int = Query(10, alias="limit", le=settings.PAGINATION_SIZE)
 ):
     try:
-        notes = get_latest_notes_db(db, user_id, offset, limit)
+        query = get_user_notes_db(db, user_id)
+        notes = paginate_query(query, offset, limit)
 
         return NotesListResponse(
-            total=len(notes),
-            offset=offset,
+            total=query.count(),
+            offset=offset + limit,
             notes=notes
         )
     except HTTPException as error:

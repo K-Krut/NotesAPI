@@ -30,12 +30,14 @@ def update_note_db(db: Session, note_record: Note, fields: dict) -> Note:
     return note_record
 
 
-def get_latest_notes_db(db: Session, user_id: int, offset: int, limit: int):
+def get_user_notes_db(db: Session, user_id: int):
     return (
         db.query(Note)
         .filter(Note.is_latest, Note.user_id == user_id)
         .order_by(Note.created_at.desc())
-        .offset(offset)
-        .limit(limit)
-        .all()
     )
+
+
+def paginate_query(query, offset: int, limit: int):
+    return query.offset(offset).limit(limit).all()
+

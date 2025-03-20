@@ -1,6 +1,8 @@
 import argparse
 import random
 from sqlalchemy.orm import Session
+
+from app.crud.notes import update_note_db
 from app.database import get_db
 from app.models.models import Note, User
 from faker import Faker
@@ -23,7 +25,7 @@ def adjust_text(text, updates):
 
 
 def seed_notes_versions(db: Session, count: int = 10):
-    notes = db.query(Note).all()
+    notes = db.query(Note).filter(Note.user_id == 1).all()
     # notes = db.query(Note).filter(Note.parent_id.isnot(None)).all()
     for _ in range(count):
         parent = random.choice(notes)
@@ -36,6 +38,8 @@ def seed_notes_versions(db: Session, count: int = 10):
             updated_at=fake.date_time_this_year(),
         )
         db.add(note)
+        updated_parent = update_note_db(db, parent, {"is_latest": False}).id
+
     db.commit()
 
 

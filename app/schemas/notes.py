@@ -49,7 +49,7 @@ class NoteResponseSimple(BaseModel):
     id: int
     name: str
     details: str
-    parent_id: int
+    parent_id: Optional[int] = None
     created_at: datetime
 
     class Config:
