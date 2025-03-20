@@ -38,6 +38,7 @@ class Note(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     details = Column(Text, nullable=False)
+    is_latest = Column(Boolean, default=True)
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
