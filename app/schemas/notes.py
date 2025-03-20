@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 
 
@@ -54,4 +54,13 @@ class NoteResponseSimple(BaseModel):
 
     class Config:
         from_attributes = True
+        arbitrary_types_allowed = True
+
+
+class NotesListResponse(BaseModel):
+    total: int
+    offset: int
+    notes: List[NoteResponseSimple]
+
+    class Config:
         arbitrary_types_allowed = True
