@@ -64,10 +64,10 @@ class NotesListResponse(BaseModel):
 
 
 class NoteHistorySchema(BaseModel):
-    id: int
-    name: str
-    parent_id: Optional[int] = None
+    note: NoteResponseSimple
+    versions: Optional[List[NoteResponseSimple]] = None
 
     class Config:
         from_attributes = True
+        arbitrary_types_allowed = True
 
