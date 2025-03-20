@@ -9,7 +9,6 @@ class NoteSchema(BaseModel):
     parent_id: Optional[int] = None
 
 
-
 class NoteParentResponse(BaseModel):
     id: int
     name: str
@@ -44,3 +43,15 @@ class NoteUpdateSchema(BaseModel):
 class NoteFullUpdateSchema(BaseModel):
     name: str
     details: str
+
+
+class NoteResponseSimple(BaseModel):
+    id: int
+    name: str
+    details: str
+    parent_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+        arbitrary_types_allowed = True
