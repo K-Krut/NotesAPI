@@ -61,3 +61,13 @@ class NotesListResponse(BaseModel):
     total: int
     offset: int
     notes: List[NoteResponseSimple]
+
+
+class NoteHistorySchema(BaseModel):
+    id: int
+    name: str
+    parent_id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
