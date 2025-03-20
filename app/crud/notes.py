@@ -28,3 +28,7 @@ def update_note_db(db: Session, note_record: Note, fields: dict) -> Note:
     db.commit()
     db.refresh(note_record)
     return note_record
+
+
+def get_latest_notes_db(db: Session, user_id: int):
+    return db.query(Note).filter(Note.is_latest, Note.user_id == user_id).all()
