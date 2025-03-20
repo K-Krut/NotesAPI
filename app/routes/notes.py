@@ -1,10 +1,12 @@
 import logging
 from http.client import HTTPException
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Query
 
 from app.auth.jwt import get_user_by_jwt_token
-from app.crud.notes import create_note_db, get_note_db, delete_note_db, update_note_db
-from app.schemas.notes import NoteSchema, NoteResponse, NoteParentResponse, NoteUpdateSchema, NoteFullUpdateSchema
+from app.core.config import settings
+from app.crud.notes import create_note_db, get_note_db, delete_note_db, update_note_db, get_latest_notes_db
+from app.schemas.notes import NoteSchema, NoteResponse, NoteParentResponse, NoteUpdateSchema, NoteFullUpdateSchema, \
+    NotesListResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.utils.notes import generate_note_details_response
@@ -34,9 +36,27 @@ def update_note_common(note_id: int, fields, db: Session, user_id: int):
     return generate_note_details_response(note_record, note_parent)
 
 
-@router.get("/")
-def get_notes():
-    pass
+@router.get("/", response_model=NotesListResponse)
+def get_notes(
+        db: Session = Depends(get_db),
+        user_id: int = Depends(get_user_by_jwt_token),
+        offset: int = Query(0, alias="offset", ge=0),
+        limit: int = Query(10, alias="limit", le=settings.PAGINATION_SIZE)
+):
+    try:
+        notes = get_latest_notes_db(db, user_id, offset, limit)
+
+        return NotesListResponse(
+            total=len(notes),
+            offset=offset,
+            notes=notes
+        )
+    except HTTPException as error:
+        raise error
+    except Exception as error:
+        logger.error(f'----#ERROR in POST /api/notes/[id]: {error}')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
+
 
 
 @router.get("/{note_id}")
@@ -53,7 +73,7 @@ def get_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
-@router.post("/", response_model=NoteResponse)
+@router.post("/")
 def create_note(note: NoteSchema, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
     try:
         note_record = create_note_db(db, note, user_id)
