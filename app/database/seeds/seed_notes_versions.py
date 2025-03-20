@@ -25,7 +25,7 @@ def adjust_text(text, updates):
 
 
 def seed_notes_versions(db: Session, count: int = 10):
-    notes = db.query(Note).filter(Note.parent_id.isnot(None)).all()
+    notes = db.query(Note).filter(Note.is_latest, Note.parent_id.isnot(None)).all()
     for _ in range(count):
         parent = random.choice(notes)
         note = Note(
@@ -38,7 +38,8 @@ def seed_notes_versions(db: Session, count: int = 10):
         )
         db.add(note)
         updated_parent = update_note_db(db, parent, {"is_latest": False}).id
-
+        print(updated_parent)
+        print(note.id)
     db.commit()
 
 

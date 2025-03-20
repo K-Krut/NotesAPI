@@ -61,3 +61,13 @@ class NotesListResponse(BaseModel):
     total: int
     offset: int
     notes: List[NoteResponseSimple]
+
+
+class NoteHistorySchema(BaseModel):
+    note: NoteResponseSimple
+    versions: Optional[List[NoteResponseSimple]] = None
+
+    class Config:
+        from_attributes = True
+        arbitrary_types_allowed = True
+

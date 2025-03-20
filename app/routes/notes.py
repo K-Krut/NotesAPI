@@ -5,9 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response, Query
 from app.auth.jwt import get_user_by_jwt_token
 from app.core.config import settings
 from app.crud.notes import create_note_db, get_note_db, delete_note_db, update_note_db, get_user_notes_db, \
-    paginate_query
+    paginate_query, get_note_versions_db
 from app.schemas.notes import NoteSchema, NoteResponse, NoteParentResponse, NoteUpdateSchema, NoteFullUpdateSchema, \
-    NotesListResponse
+    NotesListResponse, NoteHistorySchema, NoteResponseSimple
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.utils.notes import generate_note_details_response
@@ -56,12 +56,11 @@ def get_notes(
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in POST /api/notes/[id]: {error}')
+        logger.error(f'----#ERROR in GET /api/notes: {error}')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
-
-@router.get("/{note_id}")
+@router.get("/{note_id}", response_model=NoteResponse)
 def get_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
     try:
         note_record = get_checked_note(db, note_id, user_id)
@@ -71,7 +70,24 @@ def get_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in POST /api/notes/[id]: {error}')
+        logger.error(f'----#ERROR in GET /api/notes/[id]: {error}')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
+
+
+@router.get("/{note_id}/history", response_model=NoteHistorySchema)
+def get_note_history(note_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
+    try:
+        note_record = get_checked_note(db, note_id, user_id)
+        versions_records = get_note_versions_db(db, note_record)
+
+        return NoteHistorySchema(
+            note=NoteResponseSimple.model_validate(note_record),
+            versions=[NoteResponseSimple.model_validate(version) for version in versions_records]
+        )
+    except HTTPException as error:
+        raise error
+    except Exception as error:
+        logger.error(f'----#ERROR in POST /api/notes/[id]/history: {error}')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
@@ -89,7 +105,7 @@ def create_note(note: NoteSchema, db: Session = Depends(get_db), user_id: int = 
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
-@router.put("/{note_id}")
+@router.put("/{note_id}", response_model=NoteResponse)
 def update_note_fully(
         note_id: int,
         fields: NoteFullUpdateSchema,
@@ -105,7 +121,7 @@ def update_note_fully(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
-@router.patch("/{note_id}")
+@router.patch("/{note_id}", response_model=NoteResponse)
 def update_note(
         note_id: int,
         fields: NoteUpdateSchema,

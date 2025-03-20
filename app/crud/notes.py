@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
+from sqlalchemy.sql import select, union_all, text
 
 from app.models.models import Note
 from app.schemas.notes import NoteSchema
@@ -35,9 +36,25 @@ def get_user_notes_db(db: Session, user_id: int):
         db.query(Note)
         .filter(Note.is_latest, Note.user_id == user_id)
         .order_by(Note.created_at.desc())
+        .all()
     )
 
 
 def paginate_query(query, offset: int, limit: int):
     return query.offset(offset).limit(limit).all()
 
+
+def get_note_versions_db(db: Session, note: Note):
+    return db.execute(
+        text("""
+                WITH RECURSIVE note_versions AS (
+                    SELECT * FROM notes WHERE id = :note_id
+
+                    UNION ALL
+
+                    SELECT n.* FROM notes n INNER JOIN note_versions nv ON n.id = nv.parent_id
+                )
+                SELECT * FROM note_versions ORDER BY id DESC;
+            """),
+        {"note_id": note.id}
+    ).fetchall()
