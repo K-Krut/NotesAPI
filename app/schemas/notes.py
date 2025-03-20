@@ -61,6 +61,3 @@ class NotesListResponse(BaseModel):
     total: int
     offset: int
     notes: List[NoteResponseSimple]
-
-    class Config:
-        arbitrary_types_allowed = True
