@@ -19,3 +19,12 @@ def get_note_db(db: Session, note_id: int) -> Note | None:
 def delete_note_db(db: Session, note_id: int) -> None:
     db.query(Note).filter(Note.id == note_id).delete()
     db.commit()
+
+
+def update_note_db(db: Session, note_record: Note, fields: dict) -> Note:
+    for key, value in fields.items():
+        setattr(note_record, key, value)
+
+    db.commit()
+    db.refresh(note_record)
+    return note_record
