@@ -34,3 +34,13 @@ class NoteResponse(BaseModel):
     class Config:
         from_attributes = True
         arbitrary_types_allowed = True
+
+
+class NoteUpdateSchema(BaseModel):
+    name: Optional[str]
+    details: Optional[str]
+
+
+class NoteFullUpdateSchema(BaseModel):
+    name: str
+    details: str
