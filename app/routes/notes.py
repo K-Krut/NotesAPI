@@ -77,7 +77,14 @@ def get_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends
 
 @router.get("/{note_id}/history")
 def get_note_history(note_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
-    pass
+    try:
+        return note_id
+    except HTTPException as error:
+        raise error
+    except Exception as error:
+        logger.error(f'----#ERROR in POST /api/notes/[id]/history: {error}')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
+
 
 @router.post("/")
 def create_note(note: NoteSchema, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
