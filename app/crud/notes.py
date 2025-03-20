@@ -28,3 +28,16 @@ def update_note_db(db: Session, note_record: Note, fields: dict) -> Note:
     db.commit()
     db.refresh(note_record)
     return note_record
+
+
+def get_user_notes_db(db: Session, user_id: int):
+    return (
+        db.query(Note)
+        .filter(Note.is_latest, Note.user_id == user_id)
+        .order_by(Note.created_at.desc())
+    )
+
+
+def paginate_query(query, offset: int, limit: int):
+    return query.offset(offset).limit(limit).all()
+

@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE: int
     REFRESH_TOKEN_EXPIRE: int
     SECRET_KEY: str
+    PAGINATION_SIZE: int = 20
 
     @property
     def DATABASE_URL(self) -> str:

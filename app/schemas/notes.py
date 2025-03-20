@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 
 
@@ -7,7 +7,6 @@ class NoteSchema(BaseModel):
     name: str
     details: str
     parent_id: Optional[int] = None
-
 
 
 class NoteParentResponse(BaseModel):
@@ -44,3 +43,21 @@ class NoteUpdateSchema(BaseModel):
 class NoteFullUpdateSchema(BaseModel):
     name: str
     details: str
+
+
+class NoteResponseSimple(BaseModel):
+    id: int
+    name: str
+    details: str
+    parent_id: Optional[int] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+        arbitrary_types_allowed = True
+
+
+class NotesListResponse(BaseModel):
+    total: int
+    offset: int
+    notes: List[NoteResponseSimple]
