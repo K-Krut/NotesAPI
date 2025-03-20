@@ -25,6 +25,15 @@ def get_checked_note(db: Session, note_id: int, user_id: int):
     return note_record
 
 
+def update_note_common(note_id: int, fields, db: Session, user_id: int):
+    note_record = get_checked_note(db, note_id, user_id)
+    update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
+
+    note_parent = get_note_db(db, note_record.parent_id)
+
+    return generate_note_details_response(note_record, note_parent)
+
+
 @router.get("/")
 def get_notes():
     pass
@@ -66,13 +75,7 @@ def update_note_fully(
         user_id: int = Depends(get_user_by_jwt_token)
 ):
     try:
-        note_record = get_checked_note(db, note_id, user_id)
-
-        update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
-
-        note_parent = get_note_db(db, note_record.parent_id)
-
-        return generate_note_details_response(note_record, note_parent)
+        return update_note_common(note_id, fields, db, user_id)
     except HTTPException as error:
         raise error
     except Exception as error:
@@ -88,13 +91,7 @@ def update_note(
         user_id: int = Depends(get_user_by_jwt_token)
 ):
     try:
-        note_record = get_checked_note(db, note_id, user_id)
-
-        update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
-
-        note_parent = get_note_db(db, note_record.parent_id)
-
-        return generate_note_details_response(note_record, note_parent)
+        return update_note_common(note_id, fields, db, user_id)
     except HTTPException as error:
         raise error
     except Exception as error:
