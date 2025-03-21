@@ -2,7 +2,7 @@ from http.client import HTTPException
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.crud.users import get_user_by_id
+from app.crud.users import get_user_by_id, update_user
 from app.models.models import User
 
 
@@ -22,3 +22,8 @@ def validate_user_limits(db: Session, user_id: int) -> User:
         raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Monthly ai requests limit reached")
 
     return user_record
+
+
+def update_user_limits(db: Session, user: User, request_used_number=1) -> User:
+    return update_user(db, user, {"ai_requests_used": user.ai_requests_used + request_used_number})
+
