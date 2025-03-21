@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
+from app.utils.users import get_date_after_n_days
 
 
 class User(Base):
@@ -12,6 +15,10 @@ class User(Base):
     password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean(), default=False)
+
+    ai_requests_used = Column(Integer, default=0)
+    ai_requests_limit = Column(Integer, default=50)
+    ai_requests_reset = Column(DateTime, default=get_date_after_n_days(func.now()))
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())

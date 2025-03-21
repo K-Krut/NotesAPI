@@ -18,5 +18,5 @@ def summarize_text(details: TextSummarizeSchema, user_id: int = Depends(get_user
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in POST /text/summarize: {error}')
+        logger.error(f'----#ERROR in POST api/ai/text/summarize: {error}')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
