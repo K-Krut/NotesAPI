@@ -1,19 +1,27 @@
 import logging
 from http.client import HTTPException
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
 from app.auth.jwt import get_user_by_jwt_token
-from app.integrations.ai_chat import generate_summary
+from app.database import get_db
+from app.services.ai_chat import generate_summary
 from app.schemas.integration import TextSummarizeSchema
-
+from app.services.users import validate_user_limits
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
 @router.post("/text/summarize")
-def summarize_text(details: TextSummarizeSchema, user_id: int = Depends(get_user_by_jwt_token)):
+def summarize_text(
+        details: TextSummarizeSchema,
+        db: Session = Depends(get_db),
+        user_id: int = Depends(get_user_by_jwt_token)
+):
     try:
+        validated_user = validate_user_limits(db, user_id)
+
         return generate_summary(details.details)
     except HTTPException as error:
         raise error
