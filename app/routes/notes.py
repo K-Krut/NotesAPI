@@ -137,7 +137,6 @@ def update_note(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
-
 @router.delete("/{note_id}")
 def delete_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
     try:
@@ -149,7 +148,4 @@ def delete_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depe
     except Exception as error:
         logger.error(f'----#ERROR in DELETE /api/notes/[id]: {error}')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
-
-
-
 

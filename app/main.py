@@ -9,6 +9,7 @@ init_db()
 
 app.include_router(notes.router, prefix="/api/notes", tags=["notes"])
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(auth.router, prefix="/api/ai", tags=["ai"])
 
 
 @app.get("/")
