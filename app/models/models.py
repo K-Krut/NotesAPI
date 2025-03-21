@@ -39,6 +39,7 @@ class Note(Base):
     name = Column(String, nullable=False)
     details = Column(Text, nullable=False)
     is_latest = Column(Boolean, default=True)
+    summary = Column(Text, nullable=True)
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
