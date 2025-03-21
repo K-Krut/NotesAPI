@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
