@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session, aliased
-from sqlalchemy.sql import select, union_all, text
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 
 from app.models.models import Note
 from app.schemas.notes import NoteSchema
@@ -36,7 +36,6 @@ def get_user_notes_db(db: Session, user_id: int):
         db.query(Note)
         .filter(Note.is_latest, Note.user_id == user_id)
         .order_by(Note.created_at.desc())
-        .all()
     )
 
 
