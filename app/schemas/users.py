@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, EmailStr
 
 
@@ -9,6 +11,9 @@ class UserSchema(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: EmailStr
+    ai_requests_used: int
+    ai_requests_limit: int
+    ai_requests_reset: datetime
 
     class Config:
         from_attributes = True

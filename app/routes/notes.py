@@ -30,7 +30,8 @@ def get_checked_note(db: Session, note_id: int, user_id: int):
 
 def update_note_common(note_id: int, fields, db: Session, user_id: int):
     note_record = get_checked_note(db, note_id, user_id)
-    update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
+
+    note_record = update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
 
     note_parent = get_note_db(db, note_record.parent_id)
 
@@ -137,7 +138,6 @@ def update_note(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
-
 @router.delete("/{note_id}")
 def delete_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
     try:
@@ -149,7 +149,4 @@ def delete_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depe
     except Exception as error:
         logger.error(f'----#ERROR in DELETE /api/notes/[id]: {error}')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
-
-
-
 

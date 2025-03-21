@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE: int
     SECRET_KEY: str
     PAGINATION_SIZE: int = 20
+    OPENAI_API_KEY: str
 
     @property
     def DATABASE_URL(self) -> str:

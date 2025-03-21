@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel
 
@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class NoteSchema(BaseModel):
     name: str
     details: str
+    summary: Optional[str] = None
     parent_id: Optional[int] = None
 
 
@@ -13,6 +14,7 @@ class NoteParentResponse(BaseModel):
     id: int
     name: str
     details: str
+    summary: Optional[str] = None
     parent_id: Optional[int] = None
     created_at: datetime
     updated_at: datetime
@@ -26,6 +28,7 @@ class NoteResponse(BaseModel):
     id: int
     name: str
     details: str
+    summary: Optional[str] = None
     parent: Optional[NoteParentResponse] = None
     created_at: datetime
     updated_at: datetime
@@ -38,17 +41,20 @@ class NoteResponse(BaseModel):
 class NoteUpdateSchema(BaseModel):
     name: Optional[str] = None
     details: Optional[str] = None
+    summary: Optional[str] = None
 
 
 class NoteFullUpdateSchema(BaseModel):
     name: str
     details: str
+    summary: str
 
 
 class NoteResponseSimple(BaseModel):
     id: int
     name: str
     details: str
+    summary: Optional[str] = None
     parent_id: Optional[int] = None
     created_at: datetime
 
