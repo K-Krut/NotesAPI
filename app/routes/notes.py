@@ -30,7 +30,8 @@ def get_checked_note(db: Session, note_id: int, user_id: int):
 
 def update_note_common(note_id: int, fields, db: Session, user_id: int):
     note_record = get_checked_note(db, note_id, user_id)
-    update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
+
+    note_record = update_note_db(db, note_record, fields.model_dump(exclude_unset=True))
 
     note_parent = get_note_db(db, note_record.parent_id)
 
