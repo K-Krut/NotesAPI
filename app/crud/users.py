@@ -22,3 +22,12 @@ def create_user(db: Session, user: UserSchema) -> User:
     db.commit()
     db.refresh(user_record)
     return user_record
+
+
+def update_user(db: Session, user: User, fields: dict) -> User:
+    for key, value in fields.items():
+        setattr(user, key, value)
+
+    db.commit()
+    db.refresh(user)
+    return user
