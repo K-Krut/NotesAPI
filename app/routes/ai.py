@@ -7,7 +7,7 @@ from app.auth.jwt import get_user_by_jwt_token
 from app.database import get_db
 from app.services.ai_chat import generate_summary
 from app.schemas.integration import TextSummarizeSchema
-from app.services.users import validate_user_limits
+from app.services.users import validate_user_limits, update_user_limits
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -21,8 +21,11 @@ def summarize_text(
 ):
     try:
         validated_user = validate_user_limits(db, user_id)
+        summary = generate_summary(details.details)
 
-        return generate_summary(details.details)
+        update_user_limits(db, validated_user)
+
+        return {"summary": summary}
     except HTTPException as error:
         raise error
     except Exception as error:
