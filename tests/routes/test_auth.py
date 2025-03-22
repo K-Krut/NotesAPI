@@ -13,19 +13,19 @@ NON_EXISTING_USER = {
 
 INVALID_JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzQ0MzgxM_"
 
-# def test_register(client):
-#     response = client.post(
-#         "/api/auth/register",
-#         json=user
-#     )
-#     response_data = response.json()
-#
-#     assert response.status_code == 200
-#     assert response_data.get('email') == user['email']
-#     assert response_data.get('ai_requests_used') == 0
-#     assert response_data.get('ai_requests_limit') == 50
-#     assert response_data.get('ai_requests_reset')[:10] == (datetime.today() + timedelta(days=30)).isoformat()[:10]
 
+def test_register(client):
+    response = client.post(
+        "/api/auth/register",
+        json=USER
+    )
+    response_data = response.json()
+
+    assert response.status_code == 200
+    assert response_data.get('email') == USER['email']
+    assert response_data.get('ai_requests_used') == 0
+    assert response_data.get('ai_requests_limit') == 50
+    assert response_data.get('ai_requests_reset')[:10] == (datetime.today() + timedelta(days=30)).isoformat()[:10]
 
 
 def test_register_with_existing_email(client):
