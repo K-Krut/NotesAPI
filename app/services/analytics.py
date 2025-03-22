@@ -31,12 +31,17 @@ def preprocess_text(text):
 def analyze_notes(notes: List[Note]):
     """
     You'll also need to create an Analytics feature with an endpoint that
-    analyzes the notes' database. This should calculate various statistics
-    including total word count across all notes, average note length, most
-    common words or phrases, and identify the top 3 longest and shortest notes.
+    analyzes the notes' database.
+    This should calculate various statistics including:
+      - total word count across all notes,
+      - average note length,
+      - most common words or phrases,
+      - and identify the top 3 longest and shortest notes.
     Use appropriate Python libraries such as NumPy, Pandas, or NLTK for this
     analysis.
     """
     preprocessed_notes = [preprocess_text(note.details) for note in notes]
     all_words = sum([len(words) for words in preprocessed_notes])
-    return {"preprocessed_notes": preprocessed_notes, "all_words": all_words}
+    print(len(preprocessed_notes), notes.count())
+    average_note_length = int(all_words / len(preprocessed_notes))
+    return {"all_words": all_words, "average_note_length": average_note_length}
