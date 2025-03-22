@@ -1,4 +1,3 @@
-import pandas as pd
 import nltk
 import string
 
@@ -27,7 +26,6 @@ def preprocess_text(text):
     return lemmatized_tokens  # return ' '.join(lemmatized_tokens)
 
 
-
 def analyze_notes(notes: List[Note]):
     """
     You'll also need to create an Analytics feature with an endpoint that
@@ -40,8 +38,19 @@ def analyze_notes(notes: List[Note]):
     Use appropriate Python libraries such as NumPy, Pandas, or NLTK for this
     analysis.
     """
-    preprocessed_notes = [preprocess_text(note.details) for note in notes]
-    all_words = sum([len(words) for words in preprocessed_notes])
-    print(len(preprocessed_notes), notes.count())
+    preprocessed_notes = [{"note": note, "text": preprocess_text(note.details)} for note in notes]
+
+    for note in preprocessed_notes:
+        note['length'] = len(note.get("text"))
+
+    preprocessed_notes = sorted(preprocessed_notes, key=lambda note: note['length'])
+    all_words = sum([note.get("length") for note in preprocessed_notes])
     average_note_length = int(all_words / len(preprocessed_notes))
-    return {"all_words": all_words, "average_note_length": average_note_length}
+
+
+    return {
+        "all_words": all_words,
+        "average_note_length": average_note_length,
+        "shortest_notes": [x.get("note") for x in preprocessed_notes[:3]],
+        "longest_notes": [x.get("note") for x in preprocessed_notes[:-3]]
+    }
