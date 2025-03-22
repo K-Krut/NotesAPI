@@ -27,6 +27,13 @@ def preprocess_text(text):
     return lemmatized_tokens  # return ' '.join(lemmatized_tokens)
 
 
+def prepare_notes_for_response(notes_arr: List[dict]) -> List[dict]:
+    for record in notes_arr:
+        record.pop('text')
+        record['note'] = NoteResponseSimple.model_validate(record.get("note"))
+    return notes_arr
+
+
 def analyze_notes(notes: List[Note]):
     """
     You'll also need to create an Analytics feature with an endpoint that
@@ -36,8 +43,7 @@ def analyze_notes(notes: List[Note]):
       - average note length,
       - most common words or phrases,
       - and identify the top 3 longest and shortest notes.
-    Use appropriate Python libraries such as NumPy, Pandas, or NLTK for this
-    analysis.
+    Use appropriate Python libraries such as NumPy, Pandas, or NLTK for this analysis.
     """
     preprocessed_notes = [{"note": note, "text": preprocess_text(note.details)} for note in notes]
 
@@ -52,6 +58,6 @@ def analyze_notes(notes: List[Note]):
     return {
         "all_words": all_words,
         "average_note_length": average_note_length,
-        "shortest_notes": [NoteResponseSimple().model_validate(x.get("note")) for x in preprocessed_notes[:3]],
-        "longest_notes": [NoteResponseSimple().model_validate(x.get("note")) for x in preprocessed_notes[-3:]]
+        "shortest_notes": prepare_notes_for_response(preprocessed_notes[:3]),
+        "longest_notes": prepare_notes_for_response(preprocessed_notes[-3:])
     }
