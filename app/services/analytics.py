@@ -7,6 +7,7 @@ from nltk.stem import WordNetLemmatizer
 
 from typing import List
 from app.models.models import Note
+from app.schemas.notes import NoteResponseSimple
 
 nltk.download('punkt_tab')
 nltk.download('stopwords')
@@ -41,9 +42,9 @@ def analyze_notes(notes: List[Note]):
     preprocessed_notes = [{"note": note, "text": preprocess_text(note.details)} for note in notes]
 
     for note in preprocessed_notes:
-        note['length'] = len(note.get("text"))
+        note['length'] = len(note.get("text", []))
 
-    preprocessed_notes = sorted(preprocessed_notes, key=lambda note: note['length'])
+    preprocessed_notes = sorted(preprocessed_notes, key=lambda note: note.get('length'))
     all_words = sum([note.get("length") for note in preprocessed_notes])
     average_note_length = int(all_words / len(preprocessed_notes))
 
@@ -51,6 +52,6 @@ def analyze_notes(notes: List[Note]):
     return {
         "all_words": all_words,
         "average_note_length": average_note_length,
-        "shortest_notes": [x.get("note") for x in preprocessed_notes[:3]],
-        "longest_notes": [x.get("note") for x in preprocessed_notes[:-3]]
+        "shortest_notes": [NoteResponseSimple().model_validate(x.get("note")) for x in preprocessed_notes[:3]],
+        "longest_notes": [NoteResponseSimple().model_validate(x.get("note")) for x in preprocessed_notes[-3:]]
     }
