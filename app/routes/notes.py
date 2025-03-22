@@ -10,6 +10,7 @@ from app.schemas.notes import NoteSchema, NoteResponse, NoteParentResponse, Note
     NotesListResponse, NoteHistorySchema, NoteResponseSimple
 from sqlalchemy.orm import Session
 from app.database import get_db
+from app.services.analytics import analyze_notes
 from app.utils.notes import generate_note_details_response
 
 router = APIRouter()
@@ -64,7 +65,8 @@ def get_notes(
 @router.get("/stats")
 def get_notes_stats(db: Session = Depends(get_db), user_id: int = Depends(get_user_by_jwt_token)):
     try:
-        pass
+        notes = get_user_notes_db(db, user_id)
+        return analyze_notes(notes)
     except HTTPException as error:
         raise error
     except Exception as error:
