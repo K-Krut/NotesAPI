@@ -52,11 +52,25 @@ def test_login(client):
 
 
 def test_login_non_existing_email(client):
-    pass
+    response = client.post(
+        "/api/auth/login",
+        json=non_existing_user
+    )
+
+    assert response.status_code == 400
+
 
 
 def test_login_incorrect_password(client):
-    pass
+    response = client.post(
+        "/api/auth/login",
+        json={
+            'email': user['email'],
+            'password': 'INCORRECT_PASSWORD_TEST'
+        }
+    )
+
+    assert response.status_code == 401
 
 
 def test_token_refresh(client):
