@@ -57,15 +57,14 @@ def get_preprocessed_notes(notes: List[Note]) -> List[dict]:
     return sorted(result, key=lambda x: x.get('length'))
 
 
-def analyze_notes(notes: List[Note]):
+def analyze_notes(notes: List[Note]) -> dict:
     preprocessed_notes = get_preprocessed_notes(notes)
     all_words = join_all_words(preprocessed_notes)
     all_words_num = len(all_words)
-    average_note_length = int(all_words_num / len(preprocessed_notes))
 
     return {
         "all_words": all_words_num,
-        "average_note_length": average_note_length,
+        "average_note_length": int(all_words_num / len(preprocessed_notes)),
         "most_common_words": Counter(all_words).most_common(20),
         "shortest_notes": prepare_notes_for_response(preprocessed_notes[:3]),
         "longest_notes": prepare_notes_for_response(preprocessed_notes[-3:])
