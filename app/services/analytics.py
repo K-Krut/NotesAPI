@@ -1,3 +1,5 @@
+from collections import Counter
+
 import nltk
 import string
 
@@ -14,8 +16,11 @@ nltk.download('stopwords')
 nltk.download('wordnet')
 
 
+CUSTOM_FILTER_SYMBOL = "—–…•«»“”"
+
+
 def filter_token(token):
-    return token not in stopwords.words('english') and token not in string.punctuation
+    return token not in stopwords.words('english') and token not in string.punctuation and token not in CUSTOM_FILTER_SYMBOL
 
 
 def preprocess_text(text):
@@ -32,6 +37,14 @@ def prepare_notes_for_response(notes_arr: List[dict]) -> List[dict]:
         record.pop('text')
         record['note'] = NoteResponseSimple.model_validate(record.get("note"))
     return notes_arr
+
+
+def join_all_words(notes_arr: List[dict]):
+    result = []
+    for record in notes_arr:
+        result.extend(record.get('text'))
+
+    return result
 
 
 def analyze_notes(notes: List[Note]):
@@ -51,13 +64,14 @@ def analyze_notes(notes: List[Note]):
         note['length'] = len(note.get("text", []))
 
     preprocessed_notes = sorted(preprocessed_notes, key=lambda note: note.get('length'))
-    all_words = sum([note.get("length") for note in preprocessed_notes])
-    average_note_length = int(all_words / len(preprocessed_notes))
-
+    all_words_num = sum([note.get("length") for note in preprocessed_notes])
+    average_note_length = int(all_words_num / len(preprocessed_notes))
+    all_words = join_all_words(preprocessed_notes)
 
     return {
-        "all_words": all_words,
+        "all_words": all_words_num,
         "average_note_length": average_note_length,
+        "most_common_words": Counter(all_words).most_common(20),
         "shortest_notes": prepare_notes_for_response(preprocessed_notes[:3]),
         "longest_notes": prepare_notes_for_response(preprocessed_notes[-3:])
     }
