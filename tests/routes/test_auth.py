@@ -6,6 +6,11 @@ user = {
     'password': 'testpassfortests',
 }
 
+non_existing_user = {
+    'email': 'non_existing_user_email@gmail.com',
+    'password': 'testpassfortests',
+}
+
 
 def test_register(client):
     response = client.post(
@@ -30,3 +35,45 @@ def test_register_with_existing_email(client):
     assert response.status_code == 400
 
 
+def test_login(client):
+    response = client.post(
+        "/api/auth/login",
+        json=user
+    )
+
+    response_data = response.json()
+
+    assert response.status_code == 200
+
+    assert response_data.get('access_token')
+    assert response_data.get('refresh_token')
+    assert response_data.get('user').get('email') == user['email']
+
+
+
+def test_login_non_existing_email(client):
+    pass
+
+
+def test_login_incorrect_password(client):
+    pass
+
+
+def test_token_refresh(client):
+    pass
+
+
+def test_token_refresh_expire(client):
+    pass
+
+
+def test_token_refresh_invalid_token(client):
+    pass
+
+
+def test_logout(client):
+    pass
+
+
+def test_logout_invalid_token(client):
+    pass
