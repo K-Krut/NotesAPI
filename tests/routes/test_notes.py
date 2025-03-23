@@ -263,7 +263,21 @@ def test_create_note_version(client, test_user_token, note_for_tests):
 
 
 def test_get_note_history(client, test_user_token, note_with_versions):
-    pass
+    note = note_with_versions.get("latest").get("id")
+
+    response = client.get(
+        f"/api/notes/{note.get('id')}/history",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json()
+
+    assert response_data.get("note")
+    assert response_data.get("note").get("id") == note.get("id")
+    assert response_data.get("versions")
+
 
 def test_update_note_fully(client):
     pass
