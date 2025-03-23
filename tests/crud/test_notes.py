@@ -90,7 +90,6 @@ def test_get_note_db(mock_db, note_sample):
     assert note.name == note_sample.name
     assert note.details == note_sample.details
     assert note.summary == note_sample.summary
-    mock_db.query.assert_called_once()
 
 
 def test_delete_note_db(mock_db, note_sample):

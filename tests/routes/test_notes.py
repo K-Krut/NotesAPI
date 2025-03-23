@@ -1,95 +1,4 @@
-import pytest
-import random
-
-from tests.data.notes import NOTE, NOTES_DATA, NOTE_FULLY_UPDATE, NOTES_USER_2, NOTES_USER
-
-
-@pytest.fixture(scope="module")
-def test_user_token(client):
-
-    response_register = client.post("/api/auth/register", json=NOTES_USER)
-    assert response_register.status_code == 200
-
-    response = client.post("/api/auth/login", json=NOTES_USER)
-    assert response.status_code == 200
-
-    return response.json().get("access_token")
-
-
-@pytest.fixture(scope="module")
-def test_second_user_token(client):
-
-    response_register = client.post("/api/auth/register", json=NOTES_USER_2)
-    assert response_register.status_code == 200
-
-    response = client.post("/api/auth/login", json=NOTES_USER_2)
-    assert response.status_code == 200
-
-    return response.json().get("access_token")
-
-
-@pytest.fixture(scope="module")
-def bulk_create_notes(client, test_user_token):
-    notes = []
-
-    for i in NOTES_DATA:
-        response = client.post(
-            "/api/notes/",
-            json={
-                "name": i.get('name'),
-                "details": i.get('details'),
-            },
-            headers={"Authorization": f"Bearer {test_user_token}"}
-        )
-        assert response.status_code == 200
-        notes.append(response.json())
-
-    return notes
-
-
-@pytest.fixture(scope="module")
-def note_with_versions(client, test_user_token):
-    headers = {"Authorization": f"Bearer {test_user_token}"}
-
-    original = client.post(
-        "/api/notes/",
-        json=NOTE,
-        headers=headers
-    ).json()
-    parent_id = original["id"]
-    versions = [original]
-
-    for _ in range(3):
-        data = random.choice(NOTES_DATA)
-        version = client.post(
-            "/api/notes/",
-            json={
-                "name": data['name'],
-                "details": data["details"],
-                "parent_id": parent_id
-            },
-            headers=headers
-        ).json()
-        versions.append(version)
-        parent_id = version["id"]
-
-    return {
-        "original": versions[0],
-        "versions": versions[1:],
-        "latest": versions[-1]
-    }
-
-
-@pytest.fixture(scope="module")
-def note_for_tests(client, test_user_token):
-    response = client.post(
-        "/api/notes/",
-        json=NOTE,
-        headers={"Authorization": f"Bearer {test_user_token}"}
-    )
-
-    assert response.status_code == 200
-    return response.json()
+from tests.data.notes import NOTE, NOTES_DATA, NOTE_FULLY_UPDATE
 
 
 def test_create_note(client, test_user_token):
@@ -325,3 +234,21 @@ def test_delete_note_access_denied(client, test_second_user_token, test_user_tok
         headers={"Authorization": f"Bearer {test_second_user_token}"}
     )
     assert response.status_code == 403
+
+
+def test_analyze_notes_endpoint(client, bulk_create_notes_analytics, test_analytics_user_token):
+    response = client.get(
+        "/api/notes/stats",
+        headers={"Authorization": f"Bearer {test_analytics_user_token}"}
+    )
+
+    assert response.status_code == 200
+    response_data = response.json()
+
+    assert response_data.get("all_words")
+    assert response_data.get("average_note_length")
+    assert response_data.get("most_common_words")
+    assert response_data.get("shortest_notes")
+    assert response_data.get("longest_notes")
+    assert len(response_data["shortest_notes"]) <= 3
+    assert len(response_data["longest_notes"]) <= 3
