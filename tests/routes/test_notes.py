@@ -190,7 +190,12 @@ def note_with_versions(client, test_user_token):
         ).json()
         versions.append(version)
         parent_id = version["id"]
-
+    print(versions)
+    print({
+        "original": versions[0],
+        "versions": versions[1:],
+        "latest": versions[-1]
+    })
     return {
         "original": versions[0],
         "versions": versions[1:],
@@ -256,7 +261,7 @@ def test_get_note(client, note_for_tests, test_user_token):
 
 
 def test_get_note_with_parent(client, note_with_versions, test_user_token):
-    note = note_with_versions.get("latest").get("id")
+    note = note_with_versions.get("latest")
 
     response = client.get(
         f"/api/notes/{note.get('id')}",
@@ -293,7 +298,7 @@ def test_create_note_version(client, test_user_token, note_for_tests):
 
 
 def test_get_note_history(client, test_user_token, note_with_versions):
-    note = note_with_versions.get("latest").get("id")
+    note = note_with_versions.get("latest")
 
     response = client.get(
         f"/api/notes/{note.get('id')}/history",
@@ -331,8 +336,9 @@ def test_update_note(client, note_for_tests, test_user_token):
 
 def test_update_note_fully(client, note_for_tests, test_user_token):
     note = note_for_tests
-    response = client.delete(
+    response = client.put(
         f"/api/notes/{note.get('id')}",
+        json=NOTE_FULLY_UPDATE,
         headers={"Authorization": f"Bearer {test_user_token}"}
     )
 
