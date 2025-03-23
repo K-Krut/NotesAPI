@@ -13,6 +13,26 @@ NOTE = {
                "Я все еще жив. Потом он выполз из-под полотна и начал судорожно озираться в поисках места, "
 }
 
+NOTE_FULLY_UPDATE = {
+    "name": "PUT summary test",
+    "details": "PUT Знаменитый куратор Жак Соньер, пошатываясь, прошел под сводчатой аркой Большой галереи и "
+               "устремился к первой попавшейся ему на глаза картине, полотну Караваджо. Ухватился обеими "
+               "руками за позолоченную раму и стал тянуть ее на себя, пока шедевр не сорвался со стены и "
+               "не рухнул на семидесятилетнего старика Соньера, погребя его под собой.Как и предполагал Соньер, "
+               "неподалеку с грохотом опустилась металлическая решетка, преграждающая доступ в этот зал. "
+               "Паркетный пол содрогнулся. Где-то вдалеке завыла сирена сигнализации.Несколько секунд куратор "
+               "лежал неподвижно, хватая ртом воздух и пытаясь сообразить, на каком свете находится. "
+               "Я все еще жив. Потом он выполз из-под полотна и начал судорожно озираться в поисках места, ",
+    "summary": "Знаменитый куратор Жак Соньер, находясь в Лувре, случайно срывает картину Караваджо с стены и "
+               "оказывается под ней. В этот момент металлическая решетка закрывает зал, и он становится свидетелем "
+               "появления угрожающего преследователя — альбиноса с пистолетом. Альбинос требует от Соньера информацию "
+               "о неком ценном предмете, который, как оказывается, также искали его трое коллег, уже погибших, "
+               "подтвердивших его рассказы. Понимая, что его жизнь висит на волоске, Соньер пытается совладать с "
+               "собой и выдать ложные сведения. Однако, его преследователь выслеживает правду, и, после неудачной "
+               "попытки убить куратору сразу, ранит его в живот, оставляя шанс на существование, но медленно отравляя "
+               "его тело. Ситуация становится критической, и Соньер понимает, что его время на исходе."
+}
+
 NOTE_VERSION = {
     "name": "summary test",
     "details": "Знаменитый куратор Жак Соньер, пошатываясь, прошел под сводчатой аркой Большой галереи и "
@@ -279,12 +299,41 @@ def test_get_note_history(client, test_user_token, note_with_versions):
     assert response_data.get("versions")
 
 
-def test_update_note_fully(client):
-    pass
+def test_update_note(client, note_for_tests, test_user_token):
+    note = note_for_tests
+    new_name = "PATCH " + NOTE['name']
+    response = client.patch(
+        f"/api/notes/{note.get('id')}",
+        json={
+            "name": new_name,
+        },
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json()
+
+    assert response_data.get("name") == new_name
+    assert response_data.get("details") == NOTE['details']
+    assert response_data.get("parent") is None
 
 
-def test_update_note(client):
-    pass
+def test_update_note_fully(client, note_for_tests, test_user_token):
+    note = note_for_tests
+    response = client.put(
+        f"/api/notes/{note.get('id')}",
+        json=NOTE_FULLY_UPDATE,
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json()
+
+    assert response_data.get("name") == NOTE_FULLY_UPDATE['name']
+    assert response_data.get("details") == NOTE_FULLY_UPDATE['details']
+    assert response_data.get("summary") == NOTE_FULLY_UPDATE['summary']
 
 
 def test_delete_note(client):
