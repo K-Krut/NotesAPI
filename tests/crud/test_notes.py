@@ -1,6 +1,6 @@
 import pytest
 
-from app.crud.notes import create_note_db, get_note_db, delete_note_db
+from app.crud.notes import create_note_db, get_note_db, delete_note_db, update_note_db
 from app.models.models import Note
 from app.schemas.notes import NoteSchema
 
@@ -99,3 +99,15 @@ def test_delete_note_db(mock_db, note_sample):
     mock_db.query().filter().delete.assert_called_once()
     mock_db.commit.assert_called_once()
 
+
+def test_update_note_db(mock_db, note_sample):
+    new_name = "UPDATED " + note_sample.name
+    note = update_note_db(
+        mock_db,
+        note_sample,
+        {"name": new_name},
+    )
+
+    assert note.name == new_name
+    mock_db.commit.assert_called_once()
+    mock_db.refresh.assert_called_once_with(note_sample)
