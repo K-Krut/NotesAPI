@@ -116,7 +116,7 @@ def test_user_token(client):
     return response_data.get("access_token")
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def bulk_create_notes(client, test_user_token):
     notes = []
 
@@ -170,14 +170,14 @@ def note_with_versions(client, test_user_token):
 
 @pytest.fixture(scope="module")
 def note_for_tests(client, test_user_token):
-
     response = client.post(
         "/api/notes/",
         json=NOTE,
         headers={"Authorization": f"Bearer {test_user_token}"}
     )
+
     assert response.status_code == 200
-    return response.json().get("id")
+    return response.json()
 
 
 def test_create_note(client, test_user_token):
@@ -209,20 +209,61 @@ def test_get_notes(client, test_user_token, bulk_create_notes):
     assert response_data.get("offset") >= 10
 
 
-def test_create_note_version(client):
+def test_get_note(client, note_for_tests, test_user_token):
+    note = note_for_tests
+    response = client.get(
+        f"/api/notes/{note.get('id')}",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json()
+
+    assert response_data.get("name") == NOTE['name']
+    assert response_data.get("details") == NOTE['details']
+    assert response_data.get("parent") is None
+
+
+def test_get_note_with_parent(client, note_with_versions, test_user_token):
+    note = note_with_versions.get("latest").get("id")
+
+    response = client.get(
+        f"/api/notes/{note.get('id')}",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json()
+
+    assert response_data.get("name") == note.get('name')
+    assert response_data.get("details") == note.get('details')
+    assert response_data.get("parent")
+    assert response_data.get("parent").get("id") == note.get('parent').get("id")
+
+
+def test_create_note_version(client, test_user_token, note_for_tests):
+    response = client.post(
+        "/api/notes/",
+        json={
+            "name": "VERSION" + NOTE['name'],
+            "details": "VERSION\n" + NOTE['details'],
+            "parent_id": note_for_tests.get("id")
+        },
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+    response_data = response.json()
+
+    assert response.status_code == 200
+    assert response_data.get("name")
+    assert response_data.get("details")
+    assert response_data.get("parent")
+    assert response_data.get("parent").get("id") == note_for_tests.get("id")
+
+
+def test_get_note_history(client, test_user_token, note_with_versions):
     pass
-
-
-def test_get_note(client):
-    pass
-    # response = client.get(
-    #     "/api/notes/",
-    # )
-
-
-def test_get_note_history(client):
-    pass
-
 
 def test_update_note_fully(client):
     pass
