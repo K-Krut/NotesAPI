@@ -8,4 +8,10 @@ NON_EXISTING_USER = {
     'password': 'testpassfortests',
 }
 
+FAKE_USER = {
+    'email': "fake@gmail.com",
+    'password': "secret",
+}
+
 INVALID_JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzQ0MzgxM_"
+

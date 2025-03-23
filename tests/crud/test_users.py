@@ -1,31 +1,6 @@
 import pytest
-
-from app.auth.hash import get_hashed_password
 from app.crud.users import create_user, get_user_by_email, get_user_by_id, update_user
 from app.models.models import User
-from app.schemas.users import UserSchema
-
-FAKE_USER = {
-    'email': "fake@gmail.com",
-    'password': "secret",
-}
-
-
-@pytest.fixture(scope="module")
-def user_sample() -> User:
-    return User(
-        id=1,
-        email=FAKE_USER['email'],
-        password=get_hashed_password(FAKE_USER['password']),
-    )
-
-
-@pytest.fixture(scope="module")
-def user_schema_sample() -> UserSchema:
-    return UserSchema(
-        email=FAKE_USER['email'],
-        password=FAKE_USER['password'],
-    )
 
 
 def test_create_user(mock_db, user_schema_sample):
