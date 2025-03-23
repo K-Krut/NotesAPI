@@ -26,6 +26,8 @@ def user_sample() -> User:
         id=1,
         email=FAKE_USER['email'],
         password=get_hashed_password(FAKE_USER['password']),
+        ai_requests_limit=50,
+        ai_requests_used=0
     )
 
 
