@@ -1,4 +1,6 @@
 import pytest
+
+from app.crud.notes import create_note_db
 from app.models.models import Note
 from app.schemas.notes import NoteSchema
 
@@ -69,5 +71,11 @@ def note_schema_sample() -> NoteSchema:
     )
 
 
-def test_create_note_db(mock_db):
-    pass
+def test_create_note_db(mock_db, note_schema_sample):
+    note = create_note_db(mock_db, note_schema_sample, user_id=FAKE_NOTE["user_id"])
+
+    mock_db.add.assert_called_once()
+    mock_db.commit.assert_called_once()
+    mock_db.refresh.assert_called_once_with(note)
+    assert isinstance(note, Note)
+    assert note.summary == note_schema_sample.summary
