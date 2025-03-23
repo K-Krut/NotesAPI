@@ -313,9 +313,15 @@ def test_delete_note_not_found(client, test_user_token):
     assert response.status_code == 404
 
 
-def test_delete_note_access_denied(client, note_for_tests, test_second_user_token):
+def test_delete_note_access_denied(client, test_second_user_token, test_user_token):
+    note = client.post(
+        "/api/notes/",
+        json=NOTE,
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    ).json()
+
     response = client.delete(
-        f"/api/notes/{note_for_tests.get('id')}",
+        f"/api/notes/{note.get('id')}",
         headers={"Authorization": f"Bearer {test_second_user_token}"}
     )
     assert response.status_code == 403
