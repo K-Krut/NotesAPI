@@ -1,7 +1,7 @@
 import pytest
 import random
 
-from tests.data.notes import NOTE, NOTES_DATA, NOTE_FULLY_UPDATE, NOTE_VERSION, NOTES_USER, NOTES_USER_2
+from tests.data.notes import NOTE, NOTES_DATA, NOTE_FULLY_UPDATE, NOTES_USER_2, NOTES_USER
 
 
 @pytest.fixture(scope="module")
