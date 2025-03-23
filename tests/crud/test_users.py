@@ -1,7 +1,9 @@
+import email
+
 import pytest
 
 from app.auth.hash import get_hashed_password
-from app.crud.users import create_user, get_user_by_email, get_user_by_id
+from app.crud.users import create_user, get_user_by_email, get_user_by_id, update_user
 from app.models.models import User
 from app.schemas.users import UserSchema
 
@@ -59,5 +61,14 @@ def test_get_user_by_id(mock_db, user_sample):
     assert user.email == user_sample.email
 
 
-def test_update_user():
-    pass
+def test_update_user(mock_db, user_sample):
+    user = update_user(mock_db, user_sample, {
+        'email': 'updated_fake@gmail.com',
+        'ai_requests_used': 7,
+    })
+
+    assert isinstance(user, User)
+    assert user.email == user_sample.email
+
+    mock_db.commit.assert_called_once()
+    mock_db.refresh.assert_called_once()
