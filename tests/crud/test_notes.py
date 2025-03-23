@@ -1,6 +1,6 @@
 import pytest
 
-from app.crud.notes import create_note_db
+from app.crud.notes import create_note_db, get_note_db
 from app.models.models import Note
 from app.schemas.notes import NoteSchema
 
@@ -77,5 +77,17 @@ def test_create_note_db(mock_db, note_schema_sample):
     mock_db.add.assert_called_once()
     mock_db.commit.assert_called_once()
     mock_db.refresh.assert_called_once_with(note)
+
     assert isinstance(note, Note)
     assert note.summary == note_schema_sample.summary
+
+
+def test_get_note_db(mock_db, note_sample):
+    mock_db.query().filter().first.return_value = note_sample
+
+    note = get_note_db(mock_db, note_sample.id)
+
+    assert note.name == note_sample.name
+    assert note.details == note_sample.details
+    assert note.summary == note_sample.summary
+    mock_db.query.assert_called_once()
