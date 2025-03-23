@@ -215,10 +215,10 @@ def test_get_note_history_not_found(client, test_user_token):
     assert response.status_code == 404
 
 
-def test_get_note_history_access_denied(client, note_for_tests, second_user_token):
+def test_get_note_history_access_denied(client, note_for_tests, test_second_user_token):
     response = client.get(
         f"/api/notes/{note_for_tests.get('id')}/history",
-        headers={"Authorization": f"Bearer {second_user_token}"}
+        headers={"Authorization": f"Bearer {test_second_user_token}"}
     )
     assert response.status_code == 403
 
@@ -252,11 +252,11 @@ def test_update_note_not_found(client, test_user_token):
     assert response.status_code == 404
 
 
-def test_update_note_access_denied(client, note_for_tests, second_user_token):
+def test_update_note_access_denied(client, note_for_tests, test_second_user_token):
     response = client.patch(
         f"/api/notes/{note_for_tests.get('id')}",
         json={"name": "Updated"},
-        headers={"Authorization": f"Bearer {second_user_token}"}
+        headers={"Authorization": f"Bearer {test_second_user_token}"}
     )
     assert response.status_code == 403
 
@@ -287,11 +287,11 @@ def test_update_note_fully_not_found(client, test_user_token):
     assert response.status_code == 404
 
 
-def test_update_note_fully_access_denied(client, note_for_tests, second_user_token):
+def test_update_note_fully_access_denied(client, note_for_tests, test_second_user_token):
     response = client.put(
         f"/api/notes/{note_for_tests.get('id')}",
         json=NOTE_FULLY_UPDATE,
-        headers={"Authorization": f"Bearer {second_user_token}"}
+        headers={"Authorization": f"Bearer {test_second_user_token}"}
     )
     assert response.status_code == 403
 
@@ -313,9 +313,9 @@ def test_delete_note_not_found(client, test_user_token):
     assert response.status_code == 404
 
 
-def test_delete_note_access_denied(client, note_for_tests, second_user_token):
+def test_delete_note_access_denied(client, note_for_tests, test_second_user_token):
     response = client.delete(
         f"/api/notes/{note_for_tests.get('id')}",
-        headers={"Authorization": f"Bearer {second_user_token}"}
+        headers={"Authorization": f"Bearer {test_second_user_token}"}
     )
     assert response.status_code == 403
