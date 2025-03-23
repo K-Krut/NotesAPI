@@ -1,7 +1,7 @@
 import pytest
 import random
 
-from tests.data.notes import NOTE, NOTES_DATA, NOTE_FULLY_UPDATE, NOTE_VERSION, NOTES_USER
+from tests.data.notes import NOTE, NOTES_DATA, NOTE_FULLY_UPDATE, NOTE_VERSION, NOTES_USER, NOTES_USER_2
 
 
 @pytest.fixture(scope="module")
@@ -11,6 +11,18 @@ def test_user_token(client):
     assert response_register.status_code == 200
 
     response = client.post("/api/auth/login", json=NOTES_USER)
+    assert response.status_code == 200
+
+    return response.json().get("access_token")
+
+
+@pytest.fixture(scope="module")
+def test_second_user_token(client):
+
+    response_register = client.post("/api/auth/register", json=NOTES_USER_2)
+    assert response_register.status_code == 200
+
+    response = client.post("/api/auth/login", json=NOTES_USER_2)
     assert response.status_code == 200
 
     return response.json().get("access_token")
@@ -123,6 +135,22 @@ def test_get_note(client, note_for_tests, test_user_token):
     assert response_data.get("name") == NOTE['name']
     assert response_data.get("details") == NOTE['details']
     assert response_data.get("parent") is None
+
+
+def test_get_note_not_found(client, test_user_token):
+    response = client.get(
+        "/api/notes/99999999999",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+    assert response.status_code == 404
+
+
+def test_get_note_access_denied(client, note_for_tests, test_second_user_token):
+    response = client.get(
+        f"/api/notes/{note_for_tests.get('id')}",
+        headers={"Authorization": f"Bearer {test_second_user_token}"}
+    )
+    assert response.status_code == 403
 
 
 def test_get_note_with_parent(client, note_with_versions, test_user_token):

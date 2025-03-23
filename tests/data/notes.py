@@ -3,6 +3,11 @@ NOTES_USER = {
     "password": "pass12345"
 }
 
+NOTES_USER_2 = {
+    "email": "test_notes_fixture_second_user@gmail.com",
+    "password": "pass12345"
+}
+
 NOTE = {
     "name": "summary test",
     "details": "Знаменитый куратор Жак Соньер, пошатываясь, прошел под сводчатой аркой Большой галереи и "
