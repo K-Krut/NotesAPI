@@ -321,9 +321,8 @@ def test_update_note(client, note_for_tests, test_user_token):
 
 def test_update_note_fully(client, note_for_tests, test_user_token):
     note = note_for_tests
-    response = client.put(
+    response = client.delete(
         f"/api/notes/{note.get('id')}",
-        json=NOTE_FULLY_UPDATE,
         headers={"Authorization": f"Bearer {test_user_token}"}
     )
 
@@ -336,5 +335,10 @@ def test_update_note_fully(client, note_for_tests, test_user_token):
     assert response_data.get("summary") == NOTE_FULLY_UPDATE['summary']
 
 
-def test_delete_note(client):
-    pass
+def test_delete_note(client, note_for_tests, test_user_token):
+    response = client.delete(
+        f"/api/notes/{note_for_tests.get('id')}",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+
+    assert response.status_code == 204
