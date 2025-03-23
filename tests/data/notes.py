@@ -3,6 +3,11 @@ NOTES_USER = {
     "password": "pass12345"
 }
 
+ANALYTICS_USER = {
+    "email": "test_analytics_fixture@gmail.com",
+    "password": "pass12345"
+}
+
 NOTES_USER_2 = {
     "email": "test_notes_fixture_second_user@gmail.com",
     "password": "pass12345"
