@@ -1,5 +1,3 @@
-import email
-
 import pytest
 
 from app.auth.hash import get_hashed_password
