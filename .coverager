@@ -1,0 +1,21 @@
+[run]
+omit =
+    app/database/seeds/*
+    app/models/*
+    app/schemas/*
+    app/core/*
+    app/main.py
+    app/__init__.py
+    app/database/__init__.py
+    app/routes/__init__.py
+    app/services/__init__.py
+    app/utils/__init__.py
+    app/crud/__init__.py
+    app/auth/__init__.py
+    app/core/__init__.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
