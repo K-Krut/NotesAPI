@@ -124,15 +124,25 @@ NOTES_DATA = [
 
 @pytest.fixture(scope="module")
 def test_user_token(client):
-    response = client.post(
+    user = {
+        "email": "test_notes_fixture@gmail.com",
+        "password": "pass12345"
+    }
+    response_register = client.post(
         "/api/auth/register",
-        json={
-            "email": "test_notes@gmail.com",
-            "password": "pass12345"
-        }
+        json=user
+    )
+    assert response_register.status_code == 200
+
+    response = client.post(
+        "/api/auth/login",
+        json=user
     )
 
+    assert response.status_code == 200
+
     response_data = response.json()
+    print(response_data)
     return response_data.get("access_token")
 
 
