@@ -207,6 +207,22 @@ def test_get_note_history(client, test_user_token, note_with_versions):
     assert response_data.get("versions")
 
 
+def test_get_note_history_not_found(client, test_user_token):
+    response = client.get(
+        "/api/notes/999999/history",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+    assert response.status_code == 404
+
+
+def test_get_note_history_access_denied(client, note_for_tests, second_user_token):
+    response = client.get(
+        f"/api/notes/{note_for_tests.get('id')}/history",
+        headers={"Authorization": f"Bearer {second_user_token}"}
+    )
+    assert response.status_code == 403
+
+
 def test_update_note(client, note_for_tests, test_user_token):
     note = note_for_tests
     new_name = "PATCH " + NOTE['name']
@@ -227,6 +243,24 @@ def test_update_note(client, note_for_tests, test_user_token):
     assert response_data.get("parent") is None
 
 
+def test_update_note_not_found(client, test_user_token):
+    response = client.patch(
+        "/api/notes/999999",
+        json={"name": "Updated"},
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+    assert response.status_code == 404
+
+
+def test_update_note_access_denied(client, note_for_tests, second_user_token):
+    response = client.patch(
+        f"/api/notes/{note_for_tests.get('id')}",
+        json={"name": "Updated"},
+        headers={"Authorization": f"Bearer {second_user_token}"}
+    )
+    assert response.status_code == 403
+
+
 def test_update_note_fully(client, note_for_tests, test_user_token):
     note = note_for_tests
     response = client.put(
@@ -244,6 +278,24 @@ def test_update_note_fully(client, note_for_tests, test_user_token):
     assert response_data.get("summary") == NOTE_FULLY_UPDATE['summary']
 
 
+def test_update_note_fully_not_found(client, test_user_token):
+    response = client.put(
+        "/api/notes/999999",
+        json=NOTE_FULLY_UPDATE,
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+    assert response.status_code == 404
+
+
+def test_update_note_fully_access_denied(client, note_for_tests, second_user_token):
+    response = client.put(
+        f"/api/notes/{note_for_tests.get('id')}",
+        json=NOTE_FULLY_UPDATE,
+        headers={"Authorization": f"Bearer {second_user_token}"}
+    )
+    assert response.status_code == 403
+
+
 def test_delete_note(client, note_for_tests, test_user_token):
     response = client.delete(
         f"/api/notes/{note_for_tests.get('id')}",
@@ -251,3 +303,19 @@ def test_delete_note(client, note_for_tests, test_user_token):
     )
 
     assert response.status_code == 204
+
+
+def test_delete_note_not_found(client, test_user_token):
+    response = client.delete(
+        "/api/notes/999999",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+    assert response.status_code == 404
+
+
+def test_delete_note_access_denied(client, note_for_tests, second_user_token):
+    response = client.delete(
+        f"/api/notes/{note_for_tests.get('id')}",
+        headers={"Authorization": f"Bearer {second_user_token}"}
+    )
+    assert response.status_code == 403
