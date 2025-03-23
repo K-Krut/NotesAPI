@@ -168,6 +168,18 @@ def note_with_versions(client, test_user_token):
     }
 
 
+@pytest.fixture(scope="module")
+def note_for_tests(client, test_user_token):
+
+    response = client.post(
+        "/api/notes/",
+        json=NOTE,
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+    assert response.status_code == 200
+    return response.json().get("id")
+
+
 def test_create_note(client, test_user_token):
     response = client.post(
         "/api/notes/",
@@ -197,15 +209,15 @@ def test_get_notes(client, test_user_token, bulk_create_notes):
     assert response_data.get("offset") >= 10
 
 
+def test_create_note_version(client):
+    pass
+
+
 def test_get_note(client):
     pass
     # response = client.get(
     #     "/api/notes/",
     # )
-
-
-def test_create_note_version(client):
-    pass
 
 
 def test_get_note_history(client):
