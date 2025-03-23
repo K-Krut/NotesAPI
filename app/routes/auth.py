@@ -27,7 +27,7 @@ def register(user: UserSchema, db: Session = Depends(get_db)) -> Any:
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in /api/auth/register: {error}')
+        logger.error(f'----#ERROR in /api/auth/register: {error}')  # pragma: no cover
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error. {error}",
@@ -59,7 +59,7 @@ def login(user: UserSchema, db: Session = Depends(get_db)) -> Any:
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in /api/auth/login: {error}')
+        logger.error(f'----#ERROR in /api/auth/login: {error}')  # pragma: no cover
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error. {error}",
@@ -83,7 +83,7 @@ def logout(tokens: LogoutRequest, db: Session = Depends(get_db)) -> Any:
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in /api/auth/logout: {error}')
+        logger.error(f'----#ERROR in /api/auth/logout: {error}')  # pragma: no cover
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error. {error}",

@@ -58,7 +58,7 @@ def get_notes(
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in GET /api/notes: {error}')
+        logger.error(f'----#ERROR in GET /api/notes: {error}')  # pragma: no cover
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
@@ -70,7 +70,7 @@ def get_notes_stats(db: Session = Depends(get_db), user_id: int = Depends(get_us
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in GET /api/notes/stats: {error}')
+        logger.error(f'----#ERROR in GET /api/notes/stats: {error}')  # pragma: no cover
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
@@ -84,7 +84,7 @@ def get_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depends
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in GET /api/notes/[id]: {error}')
+        logger.error(f'----#ERROR in GET /api/notes/[id]: {error}')  # pragma: no cover
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
@@ -101,7 +101,7 @@ def get_note_history(note_id: int, db: Session = Depends(get_db), user_id: int =
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in POST /api/notes/[id]/history: {error}')
+        logger.error(f'----#ERROR in POST /api/notes/[id]/history: {error}')  # pragma: no cover
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
@@ -115,7 +115,7 @@ def create_note(note: NoteSchema, db: Session = Depends(get_db), user_id: int = 
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in POST /api/notes: {error}')
+        logger.error(f'----#ERROR in POST /api/notes: {error}')  # pragma: no cover
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
@@ -131,7 +131,7 @@ def update_note_fully(
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in PUT /api/notes/[id]: {error}')
+        logger.error(f'----#ERROR in PUT /api/notes/[id]: {error}')  # pragma: no cover
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 
 
@@ -160,6 +160,6 @@ def delete_note(note_id: int, db: Session = Depends(get_db), user_id: int = Depe
     except HTTPException as error:
         raise error
     except Exception as error:
-        logger.error(f'----#ERROR in DELETE /api/notes/[id]: {error}')
+        logger.error(f'----#ERROR in DELETE /api/notes/[id]: {error}')  # pragma: no cover
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
 

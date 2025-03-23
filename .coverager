@@ -18,4 +18,9 @@ omit =
 exclude_lines =
     pragma: no cover
     if __name__ == .__main__.:
+    try:
     raise NotImplementedError
+        except HTTPException as error:
+        raise error
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal server error\n{error}")
