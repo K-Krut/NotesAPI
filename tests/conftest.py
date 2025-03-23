@@ -9,7 +9,7 @@ from app.main import app
 from app.models.models import User
 from app.schemas.users import UserSchema
 from tests.data.auth import FAKE_USER
-from tests.data.notes import NOTES_USER_2, NOTES_USER, NOTES_DATA, NOTE
+from tests.data.notes import NOTES_USER_2, NOTES_USER, NOTES_DATA, NOTE, ANALYTICS_USER
 
 
 @pytest.fixture(scope="module")
@@ -54,6 +54,18 @@ def test_user_token(client):
 
 
 @pytest.fixture(scope="module")
+def test_analytics_user_token(client):
+
+    response_register = client.post("/api/auth/register", json=ANALYTICS_USER)
+    assert response_register.status_code == 200
+
+    response = client.post("/api/auth/login", json=ANALYTICS_USER)
+    assert response.status_code == 200
+
+    return response.json().get("access_token")
+
+
+@pytest.fixture(scope="module")
 def test_second_user_token(client):
 
     response_register = client.post("/api/auth/register", json=NOTES_USER_2)
@@ -77,6 +89,26 @@ def bulk_create_notes(client, test_user_token):
                 "details": i.get('details'),
             },
             headers={"Authorization": f"Bearer {test_user_token}"}
+        )
+        assert response.status_code == 200
+        notes.append(response.json())
+
+    return notes
+
+
+@pytest.fixture(scope="module")
+def bulk_create_notes_analytics(client, test_analytics_user_token):
+
+    notes = []
+
+    for i in NOTES_DATA:
+        response = client.post(
+            "/api/notes/",
+            json={
+                "name": i.get('name'),
+                "details": i.get('details'),
+            },
+            headers={"Authorization": f"Bearer {test_analytics_user_token}"}
         )
         assert response.status_code == 200
         notes.append(response.json())
