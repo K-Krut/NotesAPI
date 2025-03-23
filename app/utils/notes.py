@@ -8,7 +8,7 @@ def generate_note_details_response(note: Note, parent: Note) -> NoteResponse:
         name=note.name,
         details=note.details,
         summary=note.summary,
-        parent=NoteParentResponse.validate(parent) if parent else None,
+        parent=NoteParentResponse.model_validate(parent) if parent else None,
         created_at=note.created_at,
         updated_at=note.updated_at,
     )
